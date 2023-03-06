@@ -90,6 +90,8 @@ d3.csv("/iris.csv").then(function(data){
                                  {variety:"Virginica", color:"#b2df8a"}, 
                                  {variety:"Setosa", color:"#1f78b4"}]
     
+    // var color_classes_map = new Map(scatter_color_classes)
+
     // draw the colored dots
     svg_scatter_legend.append("g")
         .selectAll("dot")
@@ -98,22 +100,26 @@ d3.csv("/iris.csv").then(function(data){
         // TO DO: FINISH THESE
         // Hint for cx: you might want to utilize i (the index being iterated on for the current datum)
         .attr("cx", function(d, i) {
-            console.log(d);
-            return i*100;
+            console.log(i);
+            return i*440/3;
         })
         .attr("cy", function(d) {
-            return 15;
+            return 20;
         })
-        .attr("r", 10)
+        .attr("r", 6)
         .attr("stroke", "black")
         .attr("stroke-weight", 1)
-        .style("fill", function(d) {return "#1f78b4";})
+        .style("fill", function(d) {
+            console.log(Object.values(d)[1])
+            // return color_classes_map.get(Object.keys(d));
+            return Object.values(d)[1]
+        })
 
     // create the legend title
     svg_scatter_legend.append("text")
         // TO DO: FINISH THESE
-        // .attr("x", )
-        // .attr("y", )
+        .attr("x", margin.left+55)
+        .attr("y", 0)
         .text("Iris Variety")
         .style("font-size", "12px")
         .attr("alignment-baseline","middle")
@@ -121,16 +127,18 @@ d3.csv("/iris.csv").then(function(data){
     // add text labels for the dots in the legend 
     // TO DO: Finish these
     svg_scatter_legend.selectAll("legend.label")
-        // .data(...)
-        // .enter()
-        // .append("text")
-        // .attr("x", function(d, i) {...})             
-        // .attr("y", ...)
-        // .style("font-size", "12px")
-        // .attr("alignment-baseline","middle")
-        // .text(function (d) { 
-        //     return ...;
-        // });
+        .data(scatter_color_classes)
+        .enter()
+        .append("text")
+        .attr("x", function(d, i) {
+            return 7+i*440/3;
+        })             
+        .attr("y", 21)
+        .style("font-size", "12px")
+        .attr("alignment-baseline","middle")
+        .text(function (d) { 
+            return Object.values(d)[0];
+        });
     
     // Call drawScatter() here to draw the first instance of our plot
     drawScatter();
