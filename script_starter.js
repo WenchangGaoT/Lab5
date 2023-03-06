@@ -175,7 +175,7 @@ d3.csv("/iris.csv").then(function(data){
         // TO DO: Implement the x-scale domain and range for the x-axis
         var xScale_scatter = d3.scaleLinear()
                                 // TO DO: Fill these out
-                                .domain([0.95*x_axis_min, 1.05*x_axis_max])
+                                .domain([0.9*x_axis_min-0.5, 1.1*x_axis_max+0.5])
                                 .range([0, width])
     
         // TO DO: Append the scaled x-axis tick marks to the svg
@@ -210,7 +210,7 @@ d3.csv("/iris.csv").then(function(data){
     
         var yScale_scatter = d3.scaleLinear()
                             // TO DO: Fill these out
-                            .domain([0.95*y_axis_min, 1.05*y_axis_max])
+                            .domain([0.9*y_axis_min-0.5, 1.1*y_axis_max+0.5])
                             .range([height, 0])
     
         // TO DO: Append the scaled y-axis tick marks to the svg
@@ -223,6 +223,13 @@ d3.csv("/iris.csv").then(function(data){
                 .attr("class", "yAxis")
                 .style("font", "11px monaco")
                 .call(d3.axisLeft(yScale_scatter))
+
+        svg_scatter.append("text")
+            .attr("id", "scatterTooltip")
+            .attr("opacity", 0)
+            .style("padding", "10px")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "16px");
     
     
         // TODO: Draw scatter plot dots here
@@ -253,14 +260,51 @@ d3.csv("/iris.csv").then(function(data){
                     return "#a1d99b"
                 }
             })
+            .on("mouseover", function(event, d) {
+                // TO DO: Change the radius size on hover
+                d3.select(this).style("r", 10)
+                console.log(event.pageX)
+            
+                // TO DO: Add and position text to display x-axis values & y-axis label
+                svg_scatter.select("#scatterTooltip")
+                    .attr("x", 10)
+                    .attr("y", 15)
+                    .text(selectedXAxisOption + ": " + d[selectedXAxisOption]) // This should be '<x-axis label>: <x-axis value>'
+                    .attr("opacity", 10);
+
+                // TO DO: Add and position text to display y-axis values & y-axis label
+                svg_scatter.select("#scatterTooltip").append("tspan")
+                    .attr("x", 10)
+                    .attr("y", 33)
+                    .text(selectedYAxisOption + ": " + d[selectedYAxisOption]) // This should be '<y-axis label>: <y-axis value>'
+                    .attr("opacity", 1);
+
+                // TO DO: Add and position text to display the variety
+                svg_scatter.select("#scatterTooltip").append("tspan")
+                    .attr("x", 10)
+                    .attr("y", 51)
+                    .text("Variety: " + d["variety"]) // This should be 'Variety: <variety value>'
+                    .attr("opacity", 1);
+            })
+            // Code to 'remove' the tooltip information
+            .on("mouseleave", function(d) {
+                // TO DO: Change the radius size when not hovered
+                d3.select(this).style("r", 6)
+
+                // TO DO: remove tooltip when data point not being hovered
+                svg_scatter.select("#scatterTooltip")
+                    .transition()
+                    .duration(150)
+                    .attr("opacity", 0) // FIX THIS
+            })
     
         // TO DO: X axis label
-        svg_scatter.append("text")
-            .attr("text-anchor", "end")
-            // TO DO: Finish these...
-            .attr("x", width)
-            .attr("y", height+margin.top+20)
-            .text(selectedXAxisOption)
+        // svg_scatter.append("text")
+        //     .attr("text-anchor", "end")
+        //     // TO DO: Finish these...
+        //     .attr("x", width)
+        //     .attr("y", height+margin.top+20)
+        //     .text(selectedXAxisOption)
             
         // TO DO: Y axis label
         svg_scatter.append("text")
@@ -280,219 +324,9 @@ d3.csv("/iris.csv").then(function(data){
             .attr("x", 0.5*width)             
             .attr("y", -10)
             .text(selectedYAxisOption+" vs. "+selectedXAxisOption);
-    
-    
-    
-        /********************************************************************** 
-         TO DO: Complete the bar chart tasks
-    
-         Note: We provide starter code to compute the average values for each 
-         attribute. However, feel free to implement this any way you'd like.
-        ***********************************************************************/
-    
-        // Create an array that will hold all computed average values 
-        var average_data = []
-        // Compute all average values for each attribute, except 'variety'
-        average_data.push({'sepal.length':d3.mean(data, function(d){return d['sepal.length']})})
-        // TO DO (optional): Add the remaining values to your array
-        average_data.push({'sepal.width':d3.mean(data, function(d){return d['sepal.width']})})
-        average_data.push({'petal.length':d3.mean(data, function(d){return d['petal.length']})})
-        average_data.push({'petal.width':d3.mean(data, function(d){return d['petal.width']})})
-    
-        // Compute the maximum and minimum values from the average values to use for later
-        let max_average = Object.values(average_data[0])[0]
-        let min_average = Object.values(average_data[0])[0]
-        average_data.forEach(element => {
-            max_average = Math.max(max_average, Object.values(element)[0])
-            min_average = Math.min(min_average, Object.values(element)[0])
-        });
-    
-    
-        // TO DO: Create a scale for the x-axis that maps the x axis domain to the range of the canvas width
-        // Hint: the domain for X should be the attributes of the dataset
-        // xDomain = ['sepal.length', ...]
-        // then you can use 'xDomain' as input to .domain()
-        var xDomain = ['sepal.length', 'sepal.width', 'petal.length', 'petal.width']
-        var xScale_bar = d3.scaleBand()
-                    .domain(xDomain)
-                    .range([0, width])
-                    .padding(0.4)
-        
-        // TO DO: Finish this
-        svg_bar.append("g")
-            .attr("class", "xAxis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xScale_bar))
-            // ....
-            .selectAll("text")
-                .style("text-anchor", "middle")
-                .style("font", "10px monaco");
-    
-        svg_bar.append("g")
-            .attr('class', 'x axis')
-            .call(d3.axisBottom(xScale_bar).tickSize(height).tickFormat('').ticks(4))
-    
-        // TO DO: Create a scale for the y-axis that maps the y axis domain to the range of the canvas height
-        var yScale_bar = d3.scaleLinear()
-            // TO DO: Fix this!
-            .domain([0, 6.2])
-            .range ([height, 0])
-            
-        // TO DO: Finish this
-        svg_bar.append("g")
-            .attr("class", "yAxis")
-            .call(d3.axisLeft(yScale_bar))
-            // ....
-        
-        svg_bar.append("g")
-            .attr("class", "y axis")
-            .call(d3.axisLeft(yScale_bar).tickSize(-width).tickFormat('').ticks(12))
-    
-    
-        // TO DO: You can create a variable that will serve as a map function for your sequential color map
-        // Hint: Look at d3.scaleLinear() 
-        // var bar_color = d3.scaleLinear()...
-        // Hint: What would the domain and range be?
-        let bar_color = d3.scaleLinear()
-                    .domain([min_average, max_average])  
-                    .range(['#fee0d2', '#de2d26'])
-                    
-    
-        // TO DO: Append bars to the bar chart with the appropriately scaled height
-        // Hint: the data being used for the bar chart is the computed average values! Not the entire dataset
-        // TO DO: Color the bars using the sequential color map
-        // Hint: .attr("fill") should fill the bars using a function, and that function can be from the above bar_color function we created
-        svg_bar.selectAll("bar")
-            // TO DO: Fix this
-            .data(average_data)
-            .enter()
-            .append("rect")
-              .attr("stroke", 'black') 
-              .attr("x", function(d) { 
-                // console.log(Object.keys(d)[0]);
-                return xScale_bar(Object.keys(d)[0]); 
-            })
-              .attr("y", function(d) { 
-                // console.log(yScale_bar(Object.values(d)[0]));
-                return yScale_bar(Object.values(d)[0]); 
-            })
-              .attr("width", xScale_bar.bandwidth())
-              .attr("height", function(d) { 
-                // console.log(Object.values(d)[0])
-                return height-yScale_bar(Object.values(d)[0]); 
-            })
-              .attr("fill", function(d) {
-                console.log(bar_color(Object.values(d)[0]))
-                return bar_color(Object.values(d)[0]);
-              })
-            
-    
-    
-        // TO DO: Append x-axis label
-        svg_bar.append("text")
-            // TO DO: Fix this
-            .attr("text-anchor", "end")
-            // TO DO: Finish these...
-            .attr("x", width)
-            .attr("y", height+margin.top+20)
-            .text("Attribute")
-            
-        // TO DO: Append y-axis label
-        svg_bar.append("text")
-            .attr("text-anchor", "end")
-            .attr("transform", "rotate(-90)")
-            // TO DO: Finish these...
-            .attr("y", -margin.left+20)
-            .attr("x", -margin.top)
-            .text("Average")
-        // TO DO: Append bar chart title
-        svg_bar.append("text")
-            .attr("text-anchor", "middle")  
-            .style("font-size", "16px") 
-            .style("text-decoration", "underline")  
-            // TO DO: Finish these...
-            .attr("x", 0.5*width)             
-            .attr("y", -10)
-            .text("Average Values Per Attribute");
-    
+
 
         // TO DO: Append the scaled x-axis tick marks to the svg
-
-        // TO DO: Compute y-axis min and max using dropdown choice
-        // HINT: It may help to do...
-            // var y_axis_min = d3.min(data, function(d){return d[selectedYAxisOption]});
-            // var y_axis_max = ...
-
-        // TO DO: Compute the y-axis scale using the above computed min and max
-
-        // TO DO: Append the scaled y-axis tick marks to the svg
-
-
-        // Append some text to scatterplot for the tooltips, the exact text will be added later
-        // HINT: We provide this code for you to use below, it does not need to be changed
-        svg_scatter.append("text")
-            .attr("id", "scatterTooltip")
-            .attr("opacity", 0)
-            .style("padding", "10px")
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "16px");
-
-
-        // TO DO: draw your scatter plot
-        // HINT: FIX THIS CODE. We provide many hints below.
-        // svg_scatter.append("g")
-            // .selectAll("dot")
-            // .data(data)
-            // .join("circle")
-                // TO DO: Update the data being drawn (x- and y- positions) based on the user's dropdown choices
-                // .attr("cx", function(d) {return xScale_scatter(...)}) 
-                // .attr("cy", function(d) {return yScale_scatter(...)})
-                // .attr("r", 6)
-                // .attr("stroke", "black")
-                // .attr("stroke-weight", 1)
-                // .style("fill", function(d) {
-                    // return ...
-                // })
-            // TO DO: Add functionality for the tooltip mouseover function
-            // This function should display the data point's information when being hovered
-            // .on("mouseover", function(event, d) {
-                // TO DO: Change the radius size on hover
-                // d3.select(this).style("r", ...)
-            
-                // TO DO: Add and position text to display x-axis values & y-axis label
-                // svg_scatter.select("#scatterTooltip")
-                //     .attr("x", 10)
-                //     .attr("y", 10)
-                //     .text(... + ": " + ...) // This should be '<x-axis label>: <x-axis value>'
-                //     .attr("opacity", 1);
-
-                // TO DO: Add and position text to display y-axis values & y-axis label
-                // svg_scatter.select("#scatterTooltip").append("tspan")
-                    // .attr("x", ...)
-                    // .attr("y", ...)
-                    // .text(... + ": " + ...]) // This should be '<y-axis label>: <y-axis value>'
-                    // .attr("opacity", 1);
-
-                // TO DO: Add and position text to display the variety
-                // svg_scatter.select("#scatterTooltip").append("tspan")
-                    // .attr("x", ...)
-                    // .attr("y", ...)
-                    // .text(... + ...) // This should be 'Variety: <variety value>'
-                    // .attr("opacity", 1);
-            // })
-            // Code to 'remove' the tooltip information
-            // .on("mouseleave", function(d) {
-                // TO DO: Change the radius size when not hovered
-                // d3.select(this).style("r", ...)
-
-                // TO DO: remove tooltip when data point not being hovered
-                // svg_scatter.select("#scatterTooltip")
-                //     .transition()
-                //     .duration(150)
-                //     .attr("opacity", ...) // FIX THIS
-            // })
-            
-
         // TO DO: Add X axis label based on dropdown choices
         svg_scatter.append("text")
             .attr("class", "xAxisLabel")
@@ -501,7 +335,7 @@ d3.csv("/iris.csv").then(function(data){
             .attr("y", height + margin.top + 10)
             // Update x-axis label based on dropdown choice
             .text(function (d) { 
-                return ""; // FIX THIS
+                return selectedXAxisOption; // FIX THIS
             })
             
         // TO DO: Add Y axis label based on dropdown choices
@@ -512,23 +346,22 @@ d3.csv("/iris.csv").then(function(data){
             .attr("x", -margin.top)
             // Update y-axis label based on dropdown choice
             .text(function (d) { 
-                return ""; // FIX THIS
+                return selectedYAxisOption; // FIX THIS
             })
-
-        // TO DO: Add chart title based on dropdown choices
-        svg_scatter.append("text")
-            .attr("x", (width / 2))             
-            .attr("y", 0 - (margin.top / 2))
-            .attr("text-anchor", "middle")  
-            .style("font-size", "16px") 
-            .style("text-decoration", "underline")  
-            // Update chart title label based on dropdown choices
-            .text(function (d) { 
-                return ""; // FIX THIS
-            });
-
-        // TO DO: Add gridlines for both charts
-
+        
+        // var tip = d3.select("body").append("div")
+        //     .attr("class", "tooltip")
+        //     .style("opacity", 0)
+        // // Add events to circles
+        // dots.on("mouseover", function(d) {
+        //   tip.style("opacity", 1)
+        //      .html(d["variety"] + "<br/> "+ selectedXAxisOption + ": " + d[selectedXAxisOption] + "<br/>" + selectedYAxisOption + ": " + d[selectedYAxisOption])
+        //      .style("left", (d3.event.pageX-25) + "px")
+        //      .style("top", (d3.event.pageY-75) + "px")
+        //   })
+        //   .on("mouseout", function(d) {
+        //     tip.style("opacity", 0)
+        //   })
     }
   
     // TO DO: Run the appropriate code when the dropdown menu is selected for x-axis choice

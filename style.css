@@ -8,6 +8,13 @@
     opacity: 0.1;
   }
 
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #000;
+    color: #fff;
+  }
+
 body {
     font-family: 'Monaco';
     vertical-align: bottom;
@@ -32,5 +39,7 @@ div {
 }
 
 body{
+    /* text-align: center; */
     margin-top: 5%;
+    margin-left: 5%;
 }
