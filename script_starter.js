@@ -443,19 +443,46 @@ d3.csv("/iris.csv").then(function(data){
         // TO DO: Add logic for if the radio button is AVG, MAX, MIN
         // Note that "all_y_values" should be the entire array of corresponding values
         // "min_y_value" should be the minimum value in the array, and max_y_value should be the max value
+        all_y_values = []
         if (radioValue === "AVG") {
-            all_y_values = 0 // FIX THIS
-            min_y_value = 0 // FIX THIS
-            max_y_value = 0 // FIX THIS
+            // all_y_values = [] // FIX THIS
+            for (let i = 0; i < xDomain.length; i++) {
+                let property = xDomain[i]
+                all_y_values.push({property : d3.mean(data, function(d){
+                    return d[property]
+                })})
+            }
+            // min_y_value = d3.min(all_y_values, function(d){
+            //     return Object.values(d)[0]
+            // }) // FIX THIS
+            // max_y_value = d3.max(all_y_values, function(d){
+            //     return Object.values(d)[0]
+            // }) // FIX THIS
+            // console.log(min_y_value)
         } else if (radioValue === "MAX") {
-            all_y_values = 0 // FIX THIS
-            min_y_value = 0 // FIX THIS 
-            max_y_value = 0 // FIX THIS
+            for (let i = 0; i < xDomain.length; i++) {
+                let property = xDomain[i]
+                all_y_values.push({property : d3.max(data, function(d){
+                    return d[property]
+                })})
+            }
         } else {
-            all_y_values = 0 // FIX THIS
-            min_y_value = 0 // FIX THIS 
-            max_y_value = 0 // FIX THIS
+            for (let i = 0; i < xDomain.length; i++) {
+                let property = xDomain[i]
+                all_y_values.push({property : d3.min(data, function(d){
+                    return d[property]
+                })})
+            }
         } 
+
+        min_y_value = d3.min(all_y_values, function(d){
+            return Object.values(d)[0]
+        }) // FIX THIS
+        max_y_value = d3.max(all_y_values, function(d){
+            return Object.values(d)[0]
+        }) // FIX THIS
+
+        console.log(max_y_value)
   
         // TO DO: Create the legend
         // This array of objects encodes each iris variety to an assigned color
@@ -463,45 +490,46 @@ d3.csv("/iris.csv").then(function(data){
 
         // FIX THESE
         // Rectangles for legend
-        // svg_bar_legend.append("g")
-        //     .selectAll("rect")
-        //     .data(bar_classes)
-        //     .join("rect")
-        //     // Update the data being drawn based on the user's dropdown choices
-        //     .attr("x", function(d,i) { ... })
-        //     .attr("cy", 10)
-        //     .attr("width", ...)
-        //     .attr("height", ...)
-        //     .style("fill", function(d) { 
-        //         return ...; 
-        //     })
+        svg_bar_legend.append("g")
+            .selectAll("rect")
+            .data(bar_classes)
+            .join("rect")
+            // Update the data being drawn based on the user's dropdown choices
+            .attr("x", function(d,i) { return i*67; })
+            .attr("cy", 10)
+            .attr("width", 67)
+            .attr("height", 20)
+            .style("fill", function(d) { 
+                console.log(d);
+                return d; 
+            })
 
         // FIX THESE
         // Legend title
-        // svg_bar_legend.append("text")
-        //     .attr("x", ...)
-        //     .attr("y", ...)
-        //     .text("")
-        //     .style("font-size", "12px")
-        //     .attr("alignment-baseline","middle")
+        svg_bar_legend.append("text")
+            .attr("x", 0)
+            .attr("y", 0)
+            .text("Range of Values")
+            .style("font-size", "12px")
+            .attr("alignment-baseline","middle")
 
         // FIX THESE
         // Legend minimum value on the left
-        // svg_bar_legend.append("text")
-        //     .attr("x", ...)
-        //     .attr("y", ...)
-        //     .text(Math.round(... * 100) / 100) // This rounds to 2 decimal places
-        //     .style("font-size", "12px")
-        //     .attr("alignment-baseline","middle")
+        svg_bar_legend.append("text")
+            .attr("x", 0)
+            .attr("y", 20)
+            .text(Math.round(min_y_value * 100) / 100) // This rounds to 2 decimal places
+            .style("font-size", "12px")
+            .attr("alignment-baseline","middle")
 
         // FIX THESE
         // Legend maximum value on the right
-        // svg_bar_legend.append("text")
-        //     .attr("x", ...)
-        //     .attr("y", ...)
-        //     .text(Math.round(... * 100) / 100)
-        //     .style("font-size", "12px")
-        //     .attr("alignment-baseline","middle")
+        svg_bar_legend.append("text")
+            .attr("x", 4*67)
+            .attr("y", 20)
+            .text(Math.round(max_y_value * 100) / 100)
+            .style("font-size", "12px")
+            .attr("alignment-baseline","middle")
 
         // TO DO: Add your original x-axis tick marks and values
 
@@ -550,6 +578,8 @@ d3.csv("/iris.csv").then(function(data){
         console.log("radio button changed to ", this.value);
 
         // TO DO: Fix this
-        // drawBarChart(...);
+        // console.log(d3.select("input[name='barChartButton']").property("value"))
+        drawBarChart(this.value);
+        
     });
 })
