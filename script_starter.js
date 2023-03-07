@@ -444,13 +444,18 @@ d3.csv("/iris.csv").then(function(data){
         // Note that "all_y_values" should be the entire array of corresponding values
         // "min_y_value" should be the minimum value in the array, and max_y_value should be the max value
         all_y_values = []
+        sorted_values = []
         if (radioValue === "AVG") {
             // all_y_values = [] // FIX THIS
             for (let i = 0; i < xDomain.length; i++) {
-                let property = xDomain[i]
-                all_y_values.push({property : d3.mean(data, function(d){
-                    return d[property]
-                })})
+                let prop = xDomain[i]
+                all_y_values.push({i: d3.mean(data, function(d){
+                    return d[prop];
+                }),
+                name:xDomain[i]});
+                sorted_values.push(d3.mean(data, function(d){
+                    return d[xDomain[i]];
+                }))
             }
             // min_y_value = d3.min(all_y_values, function(d){
             //     return Object.values(d)[0]
@@ -463,15 +468,23 @@ d3.csv("/iris.csv").then(function(data){
             for (let i = 0; i < xDomain.length; i++) {
                 let property = xDomain[i]
                 all_y_values.push({property : d3.max(data, function(d){
-                    return d[property]
-                })})
+                    return d[property];
+                }),
+                name:xDomain[i]});
+                sorted_values.push(d3.max(data, function(d){
+                    return d[xDomain[i]];
+                }))
             }
         } else {
             for (let i = 0; i < xDomain.length; i++) {
                 let property = xDomain[i]
                 all_y_values.push({property : d3.min(data, function(d){
-                    return d[property]
-                })})
+                    return d[property];
+                }),
+                name:xDomain[i]});
+                sorted_values.push(d3.min(data, function(d){
+                    return d[property];
+                }))
             }
         } 
 
@@ -481,6 +494,22 @@ d3.csv("/iris.csv").then(function(data){
         max_y_value = d3.max(all_y_values, function(d){
             return Object.values(d)[0]
         }) // FIX THIS
+
+        for(let i = 0; i < xDomain.length; i++) {
+            for( let j = i+1; j < xDomain.length; j++) {
+                if(sorted_values[i] > sorted_values[j]) {
+                    let temp = sorted_values[i];
+                    sorted_values[i] = sorted_values[j];
+                    sorted_values[j] = temp;
+                }
+            }
+        }
+
+        for(let i = 0; i < all_y_values.length; i++) {
+            for(let j = 0; j < xDomain.length; j++) {
+                if(Object.values(all_y_values[i])[0] == sorted_values[j]) all_y_values[i].sorted = j;
+            }
+        }
 
         console.log(max_y_value)
   
@@ -531,24 +560,62 @@ d3.csv("/iris.csv").then(function(data){
             .style("font-size", "12px")
             .attr("alignment-baseline","middle")
 
-        // TO DO: Add your original x-axis tick marks and values
+        // TO DO: Add your original x-axis tick marks and value
 
         // TO DO: Add your original sequential color map
 
         // TO DO: Add domain/range for y-axis, using the radio button selection
-        // var yScale_bar = d3.scaleLinear()
-        //             .domain([0, (1.05 * ...)])
-        //             .range ([height, 0])
+        var yScale_bar = d3.scaleLinear()
+                    .domain([0, (1.05 * max_y_value)])
+                    .range ([height, 0])
 
         // TO DO: Add your original y-axis tick marks and values
+
+        svg_bar.append("g")
+        .attr("class", "xAxis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(xScale_bar))
+        // ....
+        .selectAll("text")
+            .style("text-anchor", "middle")
+            .style("font", "10px monaco");
+
+    svg_bar.append("g")
+        .attr('class', 'x axis')
+        .call(d3.axisBottom(xScale_bar).tickSize(height).tickFormat('').ticks(4))
+
+    // TO DO: Create a scale for the y-axis that maps the y axis domain to the range of the canvas height
+        
+    // TO DO: Finish this
+    svg_bar.append("g")
+        .attr("class", "yAxis")
+        .call(d3.axisLeft(yScale_bar))
 
         // TO DO: Append bars to the bar chart with the appropriately scaled height
         // Make sure the height corresponds to the radio button selection
         // Color the bars using the sequential color map
-        // svg_bar.selectAll("bar")
-        //     .data(...)
-        //     .join("rect")
-        //     ...
+        svg_bar.selectAll("bar")
+          .data(all_y_values)
+          .enter()
+          .append("rect")
+          .attr("stroke", 'black') 
+          .attr("x", function(d) { 
+            // console.log(Object.values(d)[1]);
+            return xScale_bar(Object.values(d)[1]); 
+        })
+          .attr("y", function(d) { 
+            // console.log(yScale_bar(Object.values(d)[0]));
+            return yScale_bar(Object.values(d)[0]); 
+        })
+          .attr("width", xScale_bar.bandwidth())
+          .attr("height", function(d) { 
+            // console.log(Object.values(d)[0])
+            return height-yScale_bar(Object.values(d)[0]); 
+        })
+          .attr("fill", function(d) {
+            console.log(bar_classes[Object.values(d)[2]])
+            return bar_classes[Object.values(d)[2]];
+          })
 
         // TO DO: Add y-value for each bar, above the bar. Make sure y-value corresponds to radio button
         // svg_bar.selectAll("bar-title")
