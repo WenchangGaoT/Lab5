@@ -167,7 +167,7 @@ d3.csv("/iris.csv").then(function(data){
         // var sepal_length_max = 8
         var x_axis_min = d3.min(data, function(d){
             return d[selectedXAxisOption];
-        });
+        })-0.5;
         var x_axis_max = d3.max(data, function(d){
             return d[selectedXAxisOption];
         });
@@ -175,7 +175,7 @@ d3.csv("/iris.csv").then(function(data){
         // TO DO: Implement the x-scale domain and range for the x-axis
         var xScale_scatter = d3.scaleLinear()
                                 // TO DO: Fill these out
-                                .domain([0.9*x_axis_min-0.5, 1.1*x_axis_max+0.5])
+                                .domain([x_axis_min, 1.05*x_axis_max])
                                 .range([0, width])
     
         // TO DO: Append the scaled x-axis tick marks to the svg
@@ -183,7 +183,8 @@ d3.csv("/iris.csv").then(function(data){
         svg_scatter.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xScale_scatter).tickSize(-height).tickFormat('').ticks(9))
+            .call(d3.axisBottom(xScale_scatter).tickSize(-height)
+            .tickFormat(''));
     
         svg_scatter.append("g")
             .attr("class", "xAxis")
@@ -202,7 +203,7 @@ d3.csv("/iris.csv").then(function(data){
         // var petal_length_min = 0.5
         // var petal_length_max = 7.3
         var y_axis_min = d3.min(data, function(d){
-            return d[selectedYAxisOption];
+            return d[selectedYAxisOption]-0.5;
         });
         var y_axis_max = d3.max(data, function(d){
             return d[selectedYAxisOption];
@@ -210,14 +211,15 @@ d3.csv("/iris.csv").then(function(data){
     
         var yScale_scatter = d3.scaleLinear()
                             // TO DO: Fill these out
-                            .domain([0.9*y_axis_min-0.5, 1.1*y_axis_max+0.5])
+                            .domain([y_axis_min, 1.05*y_axis_max])
                             .range([height, 0])
     
         // TO DO: Append the scaled y-axis tick marks to the svg
     
         svg_scatter.append("g")
                 .attr('class', 'y axis')
-                .call(d3.axisLeft(yScale_scatter).tickSize(-width).tickFormat('').ticks(13))
+                .call(d3.axisLeft(yScale_scatter).tickSize(-width)
+                .tickFormat(''))
     
         svg_scatter.append("g")
                 .attr("class", "yAxis")
@@ -537,8 +539,8 @@ d3.csv("/iris.csv").then(function(data){
         // FIX THESE
         // Legend title
         svg_bar_legend.append("text")
-            .attr("x", 0)
-            .attr("y", 0)
+            .attr("x", 85)
+            .attr("y", -10)
             .text("Range of Values")
             .style("font-size", "12px")
             .attr("alignment-baseline","middle")
@@ -546,8 +548,8 @@ d3.csv("/iris.csv").then(function(data){
         // FIX THESE
         // Legend minimum value on the left
         svg_bar_legend.append("text")
-            .attr("x", 0)
-            .attr("y", 20)
+            .attr("x", -20)
+            .attr("y", 10)
             .text(Math.round(min_y_value * 100) / 100) // This rounds to 2 decimal places
             .style("font-size", "12px")
             .attr("alignment-baseline","middle")
@@ -556,7 +558,7 @@ d3.csv("/iris.csv").then(function(data){
         // Legend maximum value on the right
         svg_bar_legend.append("text")
             .attr("x", 4*67)
-            .attr("y", 20)
+            .attr("y", 10)
             .text(Math.round(max_y_value * 100) / 100)
             .style("font-size", "12px")
             .attr("alignment-baseline","middle")
