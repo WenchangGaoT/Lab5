@@ -307,13 +307,14 @@ d3.csv("/iris.csv").then(function(data){
         //     .text(selectedXAxisOption)
             
         // TO DO: Y axis label
-        svg_scatter.append("text")
+        /*svg_scatter.append("text")
             .attr("text-anchor", "end")
             .attr("transform", "rotate(-90)")
             // TO DO: Finish these...
             .attr("y", -margin.left+20)
             .attr("x", -margin.top)
             .text(selectedYAxisOption)
+            */
     
         // TO DO: Chart title
         svg_scatter.append("text")
@@ -587,9 +588,16 @@ d3.csv("/iris.csv").then(function(data){
     // TO DO: Create a scale for the y-axis that maps the y axis domain to the range of the canvas height
         
     // TO DO: Finish this
+
     svg_bar.append("g")
-        .attr("class", "yAxis")
-        .call(d3.axisLeft(yScale_bar))
+                .attr("class", "yAxis")
+                .style("font", "11px monaco")
+                .call(d3.axisLeft(yScale_bar))
+
+
+    svg_bar.append("g")
+        .attr("class", "y axis")
+        .call(d3.axisLeft(yScale_bar).tickSize(-width).tickFormat('').ticks(10))
 
         // TO DO: Append bars to the bar chart with the appropriately scaled height
         // Make sure the height corresponds to the radio button selection
@@ -618,16 +626,16 @@ d3.csv("/iris.csv").then(function(data){
           })
 
         // TO DO: Add y-value for each bar, above the bar. Make sure y-value corresponds to radio button
-        // svg_bar.selectAll("bar-title")
-        //     .data(...)
-        //     .enter()
-        //     .append("text")
-        //     .classed('bar-title', true)
-        //     .attr('text-anchor', 'middle')
-        //     .attr("x", d => ...) // Make sure x position is in line with the x-tick mark
-        //     .attr("y", d => ...) // Make sure y position is above the bar
-        //     .style("font", "11px monaco")
-        //     .text(d => Math.round(... * 100) / 100) // Rounds value to 2 decimal places
+        svg_bar.selectAll("bar-title")
+             .data(all_y_values)
+             .enter()
+             .append("text")
+             .classed('bar-title', true)
+             .attr('text-anchor', 'middle')
+             .attr("x", (d) => xScale_bar(Object.values(d)[1])+28) // Make sure x position is in line with the x-tick mark
+             .attr("y", (d) => yScale_bar(Object.values(d)[0])-5) // Make sure y position is above the bar
+             .style("font", "11px monaco")
+             .text((d) =>Math.round(Object.values(d)[0] * 100) / 100) // Rounds value to 2 decimal places
 
         // Append original x-axis label
             
@@ -636,6 +644,34 @@ d3.csv("/iris.csv").then(function(data){
         // TO DO: Append bar chart title corresponding to radio button selection
 
         // TO DO: Draw gridlines for both charts 
+        svg_bar.append("text")
+            .attr("text-anchor", "middle")  
+            .style("font-size", "16px") 
+            .style("text-decoration", "underline")  
+            // TO DO: Finish these...
+            .attr("x", 0.5*width)             
+            .attr("y", -10)
+            .text(radioValue+" Values Per Attribute");
+
+
+        // TO DO: Append the scaled x-axis tick marks to the svg
+        // TO DO: Add X axis label based on dropdown choices
+        svg_bar.append("text")
+            .attr("class", "xAxisLabel")
+            .attr("text-anchor", "end")
+            .attr("x", width - 20)
+            .attr("y", height + margin.top + 10)
+            // Update x-axis label based on dropdown choice
+            .text("Attribute")
+            
+        // TO DO: Add Y axis label based on dropdown choices
+        svg_bar.append("text")
+            .attr("text-anchor", "end")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -margin.left + 20)
+            .attr("x", -margin.top)
+            // Update y-axis label based on dropdown choice
+            .text(radioValue)
     }
     
     // The below code works similarly to the scatter plot's dropdown change function
